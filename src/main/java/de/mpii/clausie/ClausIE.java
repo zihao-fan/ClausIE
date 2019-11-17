@@ -339,71 +339,75 @@ public class ClausIE {
 		int lineNo = 1;
 		for (String line = din.readLine(); line != null; line = din.readLine(), lineNo++) {
 			line = line.trim();
-			if (line.isEmpty() || line.startsWith("#"))
-				continue;
-			int sentenceId = lineNo;
-			if (options.has("l")) {
-				int tabIndex = line.indexOf('\t');
-				sentenceId = Integer.parseInt(line.substring(0, tabIndex));
-				line = line.substring(tabIndex + 1).trim();
-			}
-			if (options.has("v")) {
-				dout.print("# Line ");
-				dout.print(lineNo);
-				if (options.has("l")) {
-					dout.print(" (id ");
-					dout.print(sentenceId);
-					dout.print(")");
-				}
-				dout.print(": ");
-				dout.print(line);
-				dout.println();
-			}
-			clausIE.parse(line);
-			if (options.has("v")) {
-				dout.print("# Semantic graph: ");
-				dout.println(clausIE.getSemanticGraph().toFormattedString()
-						.replaceAll("\n", "\n#                ").trim());
-			}
 			try {
-				clausIE.detectClauses();
-			} catch(Exception e) {
-				System.err.println("[Exception] when detecting clauses from:");
-				System.err.println(line);
-				System.err.println("");
-			}
-			if (options.has("v")) {
-				dout.print("#   Detected ");
-				dout.print(clausIE.getClauses().size());
-				dout.println(" clause(s).");
-				for (Clause clause : clausIE.getClauses()) {
-					dout.print("#   - ");
-					dout.print(clause.toString(clausIE.options));
+				if (line.isEmpty() || line.startsWith("#"))
+					continue;
+				int sentenceId = lineNo;
+				if (options.has("l")) {
+					int tabIndex = line.indexOf('\t');
+					sentenceId = Integer.parseInt(line.substring(0, tabIndex));
+					line = line.substring(tabIndex + 1).trim();
+				}
+				if (options.has("v")) {
+					dout.print("# Line ");
+					dout.print(lineNo);
+					if (options.has("l")) {
+						dout.print(" (id ");
+						dout.print(sentenceId);
+						dout.print(")");
+					}
+					dout.print(": ");
+					dout.print(line);
 					dout.println();
 				}
-			}
-			clausIE.generatePropositions();
-			// dout.print("\t");
-			if (options.has("s")) {
-				dout.print(line);
-				dout.println();
-			}
+				clausIE.parse(line);
+				if (options.has("v")) {
+					dout.print("# Semantic graph: ");
+					dout.println(clausIE.getSemanticGraph().toFormattedString()
+							.replaceAll("\n", "\n#                ").trim());
+				}
+				clausIE.detectClauses();
+				if (options.has("v")) {
+					dout.print("#   Detected ");
+					dout.print(clausIE.getClauses().size());
+					dout.println(" clause(s).");
+					for (Clause clause : clausIE.getClauses()) {
+						dout.print("#   - ");
+						dout.print(clause.toString(clausIE.options));
+						dout.println();
+					}
+				}
+				clausIE.generatePropositions();
+				// dout.print("\t");
+				if (options.has("s")) {
+					dout.print(line);
+					dout.println();
+				}
 
-			// dout.print("\t");
-			// dout.println();
-			for (Proposition p : clausIE.getPropositions()) {
-				dout.print(sentenceId);
-				for (String c : p.constituents) {
-					// TODO: correct escaping
-					dout.print("\t\"");
-					dout.print(c);
-					dout.print("\"");
+				// dout.print("\t");
+				// dout.println();
+				for (Proposition p : clausIE.getPropositions()) {
+					dout.print(sentenceId);
+					for (String c : p.constituents) {
+						// TODO: correct escaping
+						dout.print("\t\"");
+						dout.print(c);
+						dout.print("\"");
+					}
+					if (options.has("p")) {
+						dout.print("\t");
+						dout.print(clausIE.lpq.getPCFGScore());
+					}
+					dout.println();
 				}
-				if (options.has("p")) {
-					dout.print("\t");
-					dout.print(clausIE.lpq.getPCFGScore());
-				}
-				dout.println();
+			} catch(StackOverflowError e) {
+				System.err.println(e);
+				System.err.println("[Error] when detecting clauses from:");
+				System.err.println(line);
+			} catch(Exception e) {
+				System.err.println(e);
+				System.err.println("[Exception] when detecting clauses from:");
+				System.err.println(line);
 			}
 		}
 
