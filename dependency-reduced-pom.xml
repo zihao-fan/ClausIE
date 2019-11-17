@@ -48,9 +48,9 @@
     </plugins>
   </build>
   <properties>
+    <jopt.version>5.0.4</jopt.version>
     <stanford-parser.version>2.0.4</stanford-parser.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <jopt.version>5.0.4</jopt.version>
   </properties>
 </project>
 

@@ -365,7 +365,13 @@ public class ClausIE {
 				dout.println(clausIE.getSemanticGraph().toFormattedString()
 						.replaceAll("\n", "\n#                ").trim());
 			}
-			clausIE.detectClauses();
+			try {
+				clausIE.detectClauses();
+			} catch(Exception e) {
+				System.err.println("[Exception] when detecting clauses from:");
+				System.err.println(line);
+				System.err.println("");
+			}
 			if (options.has("v")) {
 				dout.print("#   Detected ");
 				dout.print(clausIE.getClauses().size());
